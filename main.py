@@ -12,8 +12,8 @@ except ModuleNotFoundError:
     pass
 
 
-PAUSE_BETWEEN_PHOTOS_SECONDS = 15
-FACE_DETECTED_DURATION_SECONDS = 3
+PAUSE_BETWEEN_PHOTOS_SECONDS = 10
+FACE_DETECTED_DURATION_SECONDS = 2
 
 
 def main():
@@ -24,7 +24,7 @@ def main():
     # Use webcam if video not provided
     if not args.get("video", False):
         print("Webcam")
-        video_stream = VideoStream(src=0).start()
+        video_stream = VideoStream(src=0, resolution=(800, 480)).start()
     else:
         print(f"Video: {args['video']}")
         video_stream = cv2.VideoCapture(args["video"])
@@ -58,7 +58,6 @@ def main():
         # Resize and convert to grayscale
         resized_image = imutils.resize(frame, width=240)
         gray = cv2.cvtColor(resized_image, cv2.COLOR_BGR2GRAY)
-
         # Detect faces in the frame
         faces = face_cascade.detectMultiScale(
             gray,
@@ -67,23 +66,6 @@ def main():
             # minSize=(30, 30),
             flags=cv2.CASCADE_SCALE_IMAGE,
         )
-        # Draw a rectangle around the faces
-        # for (x, y, w, h) in faces:
-        #     cv2.rectangle(gray, (x, y), (x+w, y+h), (0, 255, 0), 2)
-
-        # # Detect smiles in each face
-        # for face in faces:
-        #     # region_of_interest = gray[y_face:y_face + h_face, x_face:x_face + w_face]
-        #     smiles = smile_cascade.detectMultiScale(
-        #         gray,
-        #         scaleFactor=1.7,
-        #         minNeighbors=20,
-        #         # minSize=(30, 30),
-        #         # flags=cv2.CASCADE_SCALE_IMAGE
-        #     )
-        #     # Draw a rectangle around smiles
-        #     for (x_smile, y_smile, w_smile, h_smile) in smiles:
-        #         cv2.rectangle(gray, (x_smile, y_smile), (x_smile + w_smile, y_smile + h_smile), (0, 255, 0), 2)
 
         # If we've already taken a photo, don't take another one for a given
         # amount of time.
@@ -96,17 +78,16 @@ def main():
             # amount of time.
             face_detected_duration = datetime.now() - face_appeared_datetime
             if face_detected_duration.total_seconds() > FACE_DETECTED_DURATION_SECONDS:
-                # Face detected - take a photo
                 print("Face found - taking photo")
+                last_photo_datetime = datetime.now()
                 gray_scale = cv2.resize(frame, (800, 480))
                 gray_scale = cv2.cvtColor(gray_scale, cv2.COLOR_BGR2GRAY)
-                last_photo_datetime = datetime.now()
                 image_pillow = Image.fromarray(gray_scale)
                 # Dither the image into a 1 bit bitmap (Just zeros and ones)
                 image_pillow = image_pillow.convert(mode='1',dither=Image.FLOYDSTEINBERG)
                 try:
                     # Clear the e-ink display and show the image
-                    epd.Clear()
+                    # epd.Clear()
                     epd.display(epd.getbuffer(image_pillow))
                 except Exception:
                     # Not running on an e-ink display - show the resulting image
