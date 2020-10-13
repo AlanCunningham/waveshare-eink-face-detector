@@ -25,7 +25,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-# Running script
+# Running the script
 If you're using the Raspberry Pi camera or a USB camera:
 ```
 (venv)$ python main.py
