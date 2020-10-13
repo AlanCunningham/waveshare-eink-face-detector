@@ -8,7 +8,7 @@ from PIL import Image
 
 try:
     import epd7in5_V2
-except Exception:
+except RuntimeError:
     # Likely not running on a Raspberry Pi
     pass
 
@@ -93,7 +93,7 @@ def main():
                     epd.display(epd.getbuffer(image_pillow))
                 except Exception:
                     # Not running on an e-ink display - show the resulting image
-                    # Display the image for debugging
+                    # in an opencv window.
                     cv2.namedWindow("CheerInk", cv2.WND_PROP_FULLSCREEN)
                     cv2.setWindowProperty(
                         "CheerInk", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN
