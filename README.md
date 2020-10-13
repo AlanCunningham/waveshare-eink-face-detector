@@ -1,6 +1,6 @@
 # Waveshare E-Ink Face Detector
 
-Detects faces and displays them as a photo on [Waveshare's 7.5 inch e-ink display](https://www.waveshare.com/7.5inch-e-paper-hat.htm).
+A Raspberry Pi powered e-ink display that detects faces and displays them as a photo on [Waveshare's 7.5 inch e-ink display](https://www.waveshare.com/7.5inch-e-paper-hat.htm).
 
 # Hardware requirements
 - Raspberry Pi
@@ -32,6 +32,7 @@ If you're using a networked camera:
 ```
 (venv)$ python main.py --video url_to_video_feed
 ```
+
 The script will look for faces and take a photo if one is detected for more than
-2 seconds.  It will then stop looking for faces for a given amount of time to
-prevent the screen from constantly updating.
+2 seconds and display it on the screen.  It'll then go to sleep for a given amount
+of time to prevent it updating while the face is still there.
