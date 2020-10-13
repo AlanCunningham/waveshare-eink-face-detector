@@ -13,7 +13,7 @@ A Raspberry Pi powered e-ink display that detects faces and displays them as a p
 # Installation
 ```
 # Clone the repository
-git clone git@github.com:AlanCunningham/krpc-scripts.git
+git clone git@github.com:AlanCunningham/waveshare-eink-face-detector.git
 
 # Create a python virtual environment
 python3 -m venv venv
