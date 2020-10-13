@@ -1,14 +1,15 @@
-import numpy as np
 import argparse
 import cv2
-import imutils
 import time
+import imutils
 from imutils.video import VideoStream
 from datetime import datetime
 from PIL import Image
+
 try:
     import epd7in5_V2
-except ModuleNotFoundError:
+except Exception:
+    # Likely not running on a Raspberry Pi
     pass
 
 
@@ -34,7 +35,6 @@ def main():
     face_cascade = cv2.CascadeClassifier(
         "haarcascades/haarcascade_frontalface_default.xml"
     )
-    smile_cascade = cv2.CascadeClassifier("haarcascades/haarcascade_smile.xml")
     last_photo_datetime = datetime.now()
     face_appeared_datetime = datetime.now()
 
@@ -84,7 +84,9 @@ def main():
                 gray_scale = cv2.cvtColor(gray_scale, cv2.COLOR_BGR2GRAY)
                 image_pillow = Image.fromarray(gray_scale)
                 # Dither the image into a 1 bit bitmap (Just zeros and ones)
-                image_pillow = image_pillow.convert(mode='1',dither=Image.FLOYDSTEINBERG)
+                image_pillow = image_pillow.convert(
+                    mode="1", dither=Image.FLOYDSTEINBERG
+                )
                 try:
                     # Clear the e-ink display and show the image
                     # epd.Clear()
