@@ -2,7 +2,7 @@
 
 A Raspberry Pi powered e-ink display that detects faces and displays them as a photo on [Waveshare's 7.5 inch e-ink display](https://www.waveshare.com/7.5inch-e-paper-hat.htm).
 
-<img src="https://github.com/AlanCunningham/waveshare-eink-face-detector/blob/main/docs/example_image.jpg?raw=true" width="60%">
+<img src="https://github.com/AlanCunningham/waveshare-eink-face-detector/blob/main/docs/example_image.jpg?raw=true">
 
 # Hardware requirements
 - Raspberry Pi
