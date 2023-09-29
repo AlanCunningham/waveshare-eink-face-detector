@@ -4,16 +4,11 @@ import time
 import imutils
 from imutils.video import VideoStream
 from datetime import datetime
+import epd7in5_V2
 from PIL import Image
 
-try:
-    import epd7in5_V2
-except RuntimeError:
-    # Likely not running on a Raspberry Pi
-    pass
 
-
-PAUSE_BETWEEN_PHOTOS_SECONDS = 10
+PAUSE_BETWEEN_PHOTOS_SECONDS = 30
 FACE_DETECTED_DURATION_SECONDS = 2
 
 
@@ -36,14 +31,13 @@ def main():
         "haarcascades/haarcascade_frontalface_default.xml"
     )
     last_photo_datetime = datetime.now()
-    face_appeared_datetime = datetime.now()
+    face_detected_timer = datetime.now()
 
-    try:
-        # Initialise and clear the e-ink screen
-        epd = epd7in5_V2.EPD()
-        epd.init()
-    except NameError:
-        pass
+    just_finished_pause = True
+
+    # Initialise and clear the e-ink screen
+    epd = epd7in5_V2.EPD()
+    epd.init()
 
     while True:
         # Get the current frame
@@ -76,8 +70,16 @@ def main():
         ):
             # Only take a photo if we've detected a face for more than a given
             # amount of time.
-            face_detected_duration = datetime.now() - face_appeared_datetime
+            if just_finished_pause:
+                print(
+                    f"Wait between photos elapsed ({PAUSE_BETWEEN_PHOTOS_SECONDS}) - ready to detect faces"
+                )
+                just_finished_pause = False
+
+            face_detected_duration = datetime.now() - face_detected_timer
             if face_detected_duration.total_seconds() > FACE_DETECTED_DURATION_SECONDS:
+                # We've detected a face for longer than the threshold - take
+                # a photo
                 print("Face found - taking photo")
                 last_photo_datetime = datetime.now()
                 gray_scale = cv2.resize(frame, (800, 480))
@@ -87,26 +89,16 @@ def main():
                 image_pillow = image_pillow.convert(
                     mode="1", dither=Image.FLOYDSTEINBERG
                 )
-                try:
-                    # Clear the e-ink display and show the image
-                    # epd.Clear()
-                    epd.display(epd.getbuffer(image_pillow))
-                except Exception:
-                    # Not running on an e-ink display - show the resulting image
-                    # in an opencv window.
-                    cv2.namedWindow("CheerInk", cv2.WND_PROP_FULLSCREEN)
-                    cv2.setWindowProperty(
-                        "CheerInk", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN
-                    )
-                    cv2.imshow("CheerInk", gray_scale)
-        else:
-            face_appeared_datetime = datetime.now()
 
-        # Show the frame on screen
-        # cv2.imshow("Frame", gray)
-        key = cv2.waitKey(1) & 0xFF
-        if key == ord("q"):
-            break
+                # Clear the e-ink display and show the image
+                # epd.Clear()
+                print("Updating display")
+                epd.display(epd.getbuffer(image_pillow))
+                time.sleep(5)
+                # epd.sleep()
+
+        else:
+            face_detected_timer = datetime.now()
 
     # Clean up the video file / webcam
     if not args.get("video", False):
